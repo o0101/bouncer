@@ -33,6 +33,6 @@
   "dependencies": {
     "express": "^4.16.3",
     "npm-watch": "^0.3.0"
-  }
+  },
   "homepage": "https://github.com/dosyago-coder-0/bouncer#readme"
 }
