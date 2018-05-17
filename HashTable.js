@@ -60,14 +60,17 @@ class HashTable {
       if ( this.probeStrategy == 'CHAINING' ) {
         let probe = 0;
         let link = this.slots[hash];
-        while( !! link.occupied && ! HashTable.keysEqual(link.key,key) && !! link.next ) {
+        while( !! link && link.occupied && ! HashTable.keysEqual(link.key,key) && !! link.next ) {
           link = link.next;
           probe += 1;
           if ( probe > MAX_PROBES ) {
             throw new TypeError( `${this.probeStrategy} Max Probes Exceeded At ${probe}` );
           }
         }
-        if ( ! link.occupied ) {
+        if ( ! link ) {
+          this.slots[hash] = { occupied: true, key, value, next: undefined };
+          this.numKeys += 1;
+        } else if ( ! link.occupied ) {
           link.key = key;
           link.value = value;
           link.occupied = true;
@@ -113,7 +116,7 @@ class HashTable {
           }
         }
         if ( HashTable.keysEqual(link.key,key) ) {
-          return value;
+          return link.value;
         } else {
           throw new TypeError(`Key not found ${key}`);
         }
@@ -143,15 +146,17 @@ class HashTable {
       if ( this.probeStrategy == 'CHAINING' ) {
         let probe = 0;
         let link = this.slots[hash];
-        while( !(link.occupied || HashTable.keysEqual(link.key,key)) && !! link.next ) {
-          link = link.next;
-          probe += 1;
-          if ( probe > MAX_PROBES ) {
-            throw new TypeError( `${this.probeStrategy} Max Probes Exceeded At ${probe}` );
+        if ( !! link ) {
+          while( !(link.occupied || HashTable.keysEqual(link.key,key)) && !! link.next ) {
+            link = link.next;
+            probe += 1;
+            if ( probe > MAX_PROBES ) {
+              throw new TypeError( `${this.probeStrategy} Max Probes Exceeded At ${probe}` );
+            }
           }
-        }
-        if ( HashTable.keysEqual(link.key,key) ) {
-          return true;
+          if ( HashTable.keysEqual(link.key,key) ) {
+            return true;
+          }
         }
         return false;
       } else {
@@ -298,4 +303,9 @@ function test() {
   x.insert('b',2);
   x.insert({c:3},3);
   Object.assign(self, {x});
+  const y = new HashTable({probeStrategy:'CHAINING'});
+  y.insert('a',1);
+  y.insert('b',2);
+  y.insert({c:3},3);
+  Object.assign(self, {y});
 }
