@@ -1,6 +1,8 @@
 // HashTable implementation for https://github.com/dosyago-coder-0/bouncer
 // helper functions are static methods on the class
 
+const MAX_PROBES = 256; // if chains or open addressing rehashes are longer than this, something is wrong
+
 class HashTable {
   constructor({
     hashFunction: hashFunction = HashTable.basicHash,
@@ -37,9 +39,141 @@ class HashTable {
       }
     }
 
-  allPairs() {
-    return [];
-  }
+  // Key Equality
+    static orderedStringify(obj) {
+      const allKeys = []; 
+      JSON.stringify(obj, (k, v) => (allKeys.push(k), v)); 
+      return JSON.stringify(obj, allKeys.sort()); 
+    }
+
+    static keysEqual(k1,k2) {
+      const sk1 = HashTable.anythingToString(k1);
+      const sk2 = HashTable.anythingToString(k2);
+      return sk1 == sk2;
+    }
+  // insert 
+    set( key, value ) {
+      return this.insert(key, value);
+    }
+    insert( key, value ) {
+      let hash = this.hashValueToTableSize( this.hashFunction(key) );
+      if ( this.probeStrategy == 'CHAINING' ) {
+        let probe = 0;
+        let link = this.slots[hash];
+        while( !! link.occupied && ! HashTable.keysEqual(link.key,key) && !! link.next ) {
+          link = link.next;
+          probe += 1;
+          if ( probe > MAX_PROBES ) {
+            throw new TypeError( `${this.probeStrategy} Max Probes Exceeded At ${probe}` );
+          }
+        }
+        if ( ! link.occupied ) {
+          link.key = key;
+          link.value = value;
+          link.occupied = true;
+          this.numKeys += 1;
+        } else if ( HashTable.keysEqual(link.key,key) ) {
+          link.value = value;
+        } else if ( ! link.next ) {
+          link.next = { occupied: true, key, value, next: undefined };
+          this.numKeys += 1;
+        }
+      } else {
+        let probe = 0;
+        while ( !! this.slots[hash] && ! HashTable.keysEqual(key,this.slots[hash].key) ) {
+          probe += 1; 
+          if ( probe > MAX_PROBES ) {
+            throw new TypeError( `${this.probeStrategy} Max Probes Exceeded At ${probe}` );
+          }
+          hash = this.hashValueToTableSize( this.hashFunction( key, probe ) );
+        }
+        if ( !! this.slots[hash] && HashTable.keysEqual(key,this.slots[hash].key) ) {
+          this.slots[hash].value = value;
+        } else {
+          this.slots[hash] = {key,value};
+          this.numKeys += 1;
+        }
+      }
+    }
+
+  // get
+    get( key ) {
+      return this.retrieve(key );
+    }
+    retrieve( key ) {
+      let hash = this.hashValueToTableSize( this.hashFunction(key) );
+      if ( this.probeStrategy == 'CHAINING' ) {
+        let probe = 0;
+        let link = this.slots[hash];
+        while( !(link.occupied || HashTable.keysEqual(link.key,key)) && !! link.next ) {
+          link = link.next;
+          probe += 1;
+          if ( probe > MAX_PROBES ) {
+            throw new TypeError( `${this.probeStrategy} Max Probes Exceeded At ${probe}` );
+          }
+        }
+        if ( HashTable.keysEqual(link.key,key) ) {
+          return value;
+        } else {
+          throw new TypeError(`Key not found ${key}`);
+        }
+      } else {
+        let probe = 0;
+        while ( !! this.slots[hash] && ! HashTable.keysEqual(key,this.slots[hash].key) ) {
+          probe += 1; 
+          if ( probe > MAX_PROBES ) {
+            throw new TypeError( `${this.probeStrategy} Max Probes Exceeded At ${probe}` );
+          }
+          hash = this.hashValueToTableSize( this.hashFunction( key, probe ) );
+        }
+        if ( !! this.slots[hash] && HashTable.keysEqual(key,this.slots[hash].key) ) {
+          return this.slots[hash].value;
+        } else {
+          throw new TypeError(`Key not found ${key}`);
+        }
+      }
+    }
+
+  // has
+    has( key ) {
+      return this.contains(key );
+    }
+    contains( key ) {
+      let hash = this.hashValueToTableSize( this.hashFunction(key) );
+      if ( this.probeStrategy == 'CHAINING' ) {
+        let probe = 0;
+        let link = this.slots[hash];
+        while( !(link.occupied || HashTable.keysEqual(link.key,key)) && !! link.next ) {
+          link = link.next;
+          probe += 1;
+          if ( probe > MAX_PROBES ) {
+            throw new TypeError( `${this.probeStrategy} Max Probes Exceeded At ${probe}` );
+          }
+        }
+        if ( HashTable.keysEqual(link.key,key) ) {
+          return true;
+        }
+        return false;
+      } else {
+        let probe = 0;
+        while ( !! this.slots[hash] && ! HashTable.keysEqual(key,this.slots[hash].key) ) {
+          probe += 1; 
+          if ( probe > MAX_PROBES ) {
+            throw new TypeError( `${this.probeStrategy} Max Probes Exceeded At ${probe}` );
+          }
+          hash = this.hashValueToTableSize( this.hashFunction( key, probe ) );
+        }
+        if ( !! this.slots[hash] && HashTable.keysEqual(key,this.slots[hash].key) ) {
+          return true;
+        }
+        return false;
+      }
+    }
+  
+  // iterate table to get all pairs
+    allPairs() {
+      return [];
+    }
 
   // Sizing calculations
 
@@ -97,7 +231,7 @@ class HashTable {
       // This code is take from my tifuhash https://github.com/dosyago-coder-0/tifuhash
       const keyString = HashTable.anythingToString( key );
       let n = Array.from(keyString);
-      let m = seed;
+      let m = seed + '';
       if ( n.length == 0 ) {
         // seed only
         n = [m];
@@ -137,12 +271,12 @@ class HashTable {
       const type = Object.prototype.toString.call( a );
       let json = '[json:circular]';
       try {
-        json = JSON.stringify(a);
-      } catch(e) {};
+        json = HashTable.orderedStringify(a);
+      } catch(e) {console.warn(e)};
       const str = a+'';
       const numStr = a+0+'';
       const numStrStrict = (a*1)+'';
-      const rep = `${type}:${json}:${str}:${numStr}:{numStrStrict}`;
+      const rep = `${type}:${json}:${str}:${numStr}:${numStrStrict}`;
       return rep;   
     }
     
@@ -156,4 +290,12 @@ class HashTable {
 
 Object.assign( self, {HashTable});
 
-new HashTable();
+test();
+
+function test() {
+  const x = new HashTable();
+  x.insert('a',1);
+  x.insert('b',2);
+  x.insert({c:3},3);
+  Object.assign(self, {x});
+}
