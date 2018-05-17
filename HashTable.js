@@ -34,6 +34,7 @@ class HashTable {
     } = {} ) {
       this.numSlots = this.calculateNumSlots({ pairsList, growthRate });
       this.slots = new Array( this.numSlots );
+      this.numKeys = 0;
       if ( Array.isArray( pairsList ) ) {
         pairsList.forEach( ([key, value]) => this.insert(key, value) );
       }
@@ -51,6 +52,7 @@ class HashTable {
       const sk2 = HashTable.anythingToString(k2);
       return sk1 == sk2;
     }
+
   // insert 
     set( key, value ) {
       return this.insert(key, value);
@@ -96,6 +98,9 @@ class HashTable {
           this.slots[hash] = {key,value};
           this.numKeys += 1;
         }
+      }
+      if ( this.numKeys / this.numSlots > this.maxRatio ) {
+        this.growAndRehashAllEntries();
       }
     }
 
@@ -154,7 +159,7 @@ class HashTable {
               throw new TypeError( `${this.probeStrategy} Max Probes Exceeded At ${probe}` );
             }
           }
-          if ( HashTable.keysEqual(link.key,key) ) {
+          if ( HashTable.keysEqual(link.key,key) && link.occupied ) {
             return true;
           }
         }
@@ -175,9 +180,80 @@ class HashTable {
       }
     }
   
+  // delete 
+    delete( key ) {
+      return this.remove(key );
+    }
+    remove( key ) {
+      let hash = this.hashValueToTableSize( this.hashFunction(key) );
+      if ( this.probeStrategy == 'CHAINING' ) {
+        let probe = 0;
+        let link = this.slots[hash];
+        if ( !! link ) {
+          while( !(link.occupied || HashTable.keysEqual(link.key,key)) && !! link.next ) {
+            link = link.next;
+            probe += 1;
+            if ( probe > MAX_PROBES ) {
+              throw new TypeError( `${this.probeStrategy} Max Probes Exceeded At ${probe}` );
+            }
+          }
+          if ( HashTable.keysEqual(link.key,key) && link.occupied ) {
+            link.occupied = false;
+            this.numKeys -= 1;
+            return true;
+          }
+        }
+        return false;
+      } else {
+        let probe = 0;
+        while ( !! this.slots[hash] && ! HashTable.keysEqual(key,this.slots[hash].key) ) {
+          probe += 1; 
+          if ( probe > MAX_PROBES ) {
+            throw new TypeError( `${this.probeStrategy} Max Probes Exceeded At ${probe}` );
+          }
+          hash = this.hashValueToTableSize( this.hashFunction( key, probe ) );
+        }
+        if ( !! this.slots[hash] && HashTable.keysEqual(key,this.slots[hash].key) ) {
+          delete this.slots[hash];
+          this.numKeys -= 1;
+          return true;
+        }
+        return false;
+      }
+    }
+
   // iterate table to get all pairs
     allPairs() {
-      return [];
+      const pairs = [];
+      if ( this.probeStrategy == 'CHAINING' ) {
+        for( let hash = 0; hash < this.slots.length; hash++ ) {
+          let probe = 0;
+          let link = this.slots[hash];
+          if ( !! link ) {
+            if ( link.occupied ) {
+              pairs.push( [link.key, link.value] );
+            }
+            while( !! link.next ) {
+              link = link.next;
+              if ( link.occupied ) {
+                pairs.push( [link.key, link.value] );
+              }
+              probe += 1;
+              if ( probe > MAX_PROBES ) {
+                throw new TypeError( `${this.probeStrategy} Max Probes Exceeded At ${probe}` );
+              }
+            }
+          }
+        }
+      } else {
+        for( let hash = 0; hash < this.slots.length; hash++ ) {
+          if ( !! this.slots[hash] ) {
+            const item = this.slots[hash];
+            pairs.push( [item.key, item.value] );
+          }
+        }
+      }
+      return pairs;
     }
 
   // Sizing calculations
@@ -198,11 +274,23 @@ class HashTable {
     // generalized to collissions 
     // from https://en.wikipedia.org/wiki/Birthday_problem#Cast_as_a_collision_problem
 
-    static numSlotsForCollissionProbability(p,numKeys) {
+    static numSlotsForCollisionProbability(p,numKeys) {
       return (numKeys**2)/(2*Math.log(1/1-p));
     }
-    static numKeysForCollissionProbability(p,numSlots) {
+    static numKeysForCollisionProbability(p,numSlots) {
       return Math.ceil(Math.sqrt(Math.log(1/(1-p))*2*numSlots));
+    }
+
+    // This is interesting
+      // If we set desired collision probability
+      // Then the maxRatio permitted changes with the number of keys
+      // So we need to check
+      // On every insert
+      // The new max ratio
+      // And see if the actual table ratio exceeds it. 
+      // And if it does, we need to grow the table. 
+    static maxRatioForCollisionProbability(p,numKeys) {
+      return 2*Math.log(1/(1-p))/numKeys;
     }
 
     static toThisOrNextPowerOfTwo(num) {
