@@ -16,7 +16,7 @@ So far none.
 
 ## To Implement
 
-- Hash table (insert, delete, update, search)
+- Hash table (insert, delete, update, search) [DONE!]
 - Linked list (insert, delete, update, search)
 - Graph (insert, delete, update, search ( bfs, dfs ))
 - List (insert, delete, update, search ( binary search on sorted ), sort ( quick sort, merge sort ))
