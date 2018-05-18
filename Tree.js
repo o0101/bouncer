@@ -5,9 +5,10 @@
 {
   class Tree {
     constructor() {
-      this.root = {data:null, children:[]};
+      this.root = {data: null, children:[], isRoot: true};
       this.v = {};
       this.e = [];
+      Object.freeze(this);
     }
     addEdge( node, data ) {
       const newNode = {data, children:[]};
