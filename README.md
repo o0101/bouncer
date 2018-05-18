@@ -12,12 +12,11 @@ Whether or not these are the "right" or "fair" metric does not matter to me. The
 
 ## Implemented
 
-So far none.
+- Hash table (insert, delete, update, search) [DONE!]
+- Linked list (insert, delete, update, search) [DONE!]
 
 ## To Implement
 
-- Hash table (insert, delete, update, search) [DONE!]
-- Linked list (insert, delete, update, search)
 - Graph (insert, delete, update, search ( bfs, dfs ))
 - List (insert, delete, update, search ( binary search on sorted ), sort ( quick sort, merge sort ))
 - 2D arrays (insert, delete, update, search)
