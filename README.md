@@ -14,14 +14,17 @@ Whether or not these are the "right" or "fair" metric does not matter to me. The
 
 - Hash table (insert, delete, update, search) [DONE!]
 - Linked list (insert, delete, update, search) [DONE!]
+- Tree (add edge, traverse ( bfs, dfs (preorder, postorder) )) [DONE!]
+
 
 ## To Implement
 
-- Graph (insert, delete, update, search ( bfs, dfs ))
+- Binary search tree (add edge, reverse tree, search ( dfs (inorder) )
+- Graph (add edge, remove edge, search ( bfs, dfs ))
+
 - List (insert, delete, update, search ( binary search on sorted ), sort ( quick sort, merge sort ))
 - 2D arrays (insert, delete, update, search)
 - Dynamic arrays (insert, delete, update, search, resize ( allocation strategy ))
-- Binary search tree (insert, delete, update, search)
 - Algorithm: dynamic programming ( memorization )
 - Algorithm: branch and bound 
 - Concept: Big-O (in function comments do Big-O for each function, also write BigO function to instantiate and test and discover experimental and round to "rought" order coefficient)
