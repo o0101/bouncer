@@ -81,6 +81,7 @@
   }
 
   { 
+    // Note: for an inorder traversal see the file BinarySearchTree.js :)
     // Iterative PreOrderDFS
     class IterativePreOrderDFS {
       constructor( tree ) {
