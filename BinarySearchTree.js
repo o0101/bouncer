@@ -35,6 +35,39 @@
       this.root = { data: null, left: null, right: null };
       this.numKeys = 0;
     }
+    prune() {
+      const queue = [this.root];
+      while( queue.length ) {
+        const node = queue.pop();
+        const {left,right} = node;
+        if ( !! left ) {
+          if ( left.data == null ) {
+            node.left = null;
+          } else {
+            queue.unshift( left ); 
+          }
+        } 
+        if ( !! right ) {
+          if ( right.data == null ) {
+            node.right = null;
+          } else {
+            queue.unshift( right );
+          }
+        }
+      }
+    }
+    reverse() {
+      reverser(this.root);
+      function reverser(node) {
+        if ( ! node ) {
+          return;
+        }
+        const tmp = node.right; 
+        node.right = reverser(node.left);
+        node.left = reverser(tmp);
+        return node;
+      }
+    }
     static fullEmptyOfHeight( h ) {
       const b = new this;
       const total = 2**h - 1;
@@ -117,6 +150,7 @@
         // DFS will bring us deepest children first, which may
         // be descendent of a node which also has null data
         // so we end up deleting more than we need
+        // DONE implemented prune method
       const idealHeight = Math.ceil(Math.log2(this.numKeys+1));
       const newTree = BinarySearchTree.fullEmptyOfHeight(idealHeight);
       const newIterator = new BSTInorder(newTree, {showNodes: true});
@@ -130,6 +164,7 @@
       }
       this.root = newTree.root;
       this.knownDepth = idealHeight;
+      this.prune();
     }
     toString() {
       return JSON.stringify(this.root, ['left', 'data', 'right'], 2 );

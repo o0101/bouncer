@@ -15,11 +15,10 @@ Whether or not these are the "right" or "fair" metric does not matter to me. The
 - Hash table (insert, delete, update, search) [DONE!]
 - Linked list (insert, delete, update, search) [DONE!]
 - Tree (add edge, traverse ( bfs, dfs (preorder, postorder) )) [DONE!]
-
+- Binary search tree (add edge, reverse tree, search ( dfs (inorder) )
 
 ## To Implement
 
-- Binary search tree (add edge, reverse tree, search ( dfs (inorder) )
 - Graph (add edge, remove edge, search ( bfs, dfs ))
 
 - List (insert, delete, update, search ( binary search on sorted ), sort ( quick sort, merge sort ))
