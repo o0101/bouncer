@@ -5,7 +5,9 @@
   
   // this is a singly linked list
     // you can make it circular by calling
-    // this.insertAfter( this.last, this.head );
+    // this.circle();
+    // all the iterations of the list can deal with a full cycle ( i.e, a circular list )
+    // but all of them halt when a sub cycle is detected ( which otherwise would loop unceasingly )
   class LinkedList {
     constructor( listName = '' ) {
       // Freeze it
@@ -31,7 +33,7 @@
     }
     // cycle checks
       // this only checks if the entire list is circular
-      // not if there is some other cycle
+      // not if there is some other smaller sub cycle
       get isCircular() {
         let slow = this.head, fast = this.head; 
         while( !! slow && !! fast && !! fast.next ) {
@@ -50,7 +52,7 @@
         }
         return false;
       }
-      // this returns a cycle in this list ( whether or not it is a circular list )
+      // this checks whether there is a sub cycle
       get hasSubCycle() {
         let slow = this.head, fast = this.head; 
         while( !! slow && !! fast && !! fast.next ) {
