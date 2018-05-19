@@ -31,6 +31,7 @@
 
   class BinarySearchTree {
     constructor( ) {
+      this.knownDepth = 0;
       this.root = { data: null, left: null, right: null };
       this.numKeys = 0;
     }
@@ -85,23 +86,38 @@
     findParent(item) {
       let node = this.root;
       let p = node;
+      let height = 0;
       while( !! node ) {
         if ( node.data == item || node.data == null ) {
-          return node;
+          p = node;
+          break;
         } else if ( item < node.data ) {
+          height += 1;
           p = node;
           node = node.left;
         } else if ( item > node.data ) {
+          height += 1;
           p = node;
           node = node.right;
         }
       }
+      if ( height > this.knownDepth ) {
+        this.knownDepth = height;
+      }
       return p;
     }
     rebalance() {
-      // create an empty binary tree
-      // copy the tree across
-      const idealHeight = Math.ceil(Math.log2(this.numKeys));
+      // create an empty binary tree of ideal height
+      // copy the tree across inorder
+        // we could prune the tree but forget about that for now
+        // i think an easy way to prune would be to do BFS
+        // and when we see a node, look at its children and if the 
+        // children have null data then delete that child
+        // reason we do it like that is
+        // DFS will bring us deepest children first, which may
+        // be descendent of a node which also has null data
+        // so we end up deleting more than we need
+      const idealHeight = Math.ceil(Math.log2(this.numKeys+1));
       const newTree = BinarySearchTree.fullEmptyOfHeight(idealHeight);
       const newIterator = new BSTInorder(newTree, {showNodes: true});
       const thisIterator = new BSTInorder(this);
@@ -113,6 +129,7 @@
         node.data = inorder.shift();
       }
       this.root = newTree.root;
+      this.knownDepth = idealHeight;
     }
     toString() {
       return JSON.stringify(this.root, ['left', 'data', 'right'], 2 );
@@ -126,14 +143,14 @@
   function test_bst() {
     console.log("Testing BST...");
     const b = new BinarySearchTree();
-    const list = new Array(15).join('.').split('.').map( (_,i) => i );
+    const list = new Array(16).join('.').split('.').map( (_,i) => i );
     list.forEach( i => b.insert(i) );
     console.log(b);
     Object.assign(self, {b});
     const tw = new BSTInorder(b);
     console.log( ...tw );
-    console.log(b+'');
+    console.log(b);
     b.rebalance();
-    console.log(b+'');
+    console.log(b);
   }
 }
