@@ -18,10 +18,10 @@ Whether or not these are the "right" or "fair" metric does not matter to me. The
 - Binary search tree (add edge, rebalance, reverse tree, search ( dfs (inorder) ) [DONE!]
 - Graph (add edge, search ( bfs )) [DONE!]
 
-## To Implement
+## In Progress
 
 - Algorithm: dynamic programming ( memorization )
-  - [omg i can't believe i actually get it]
+
 
 
 
