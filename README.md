@@ -18,21 +18,21 @@ Whether or not these are the "right" or "fair" metric does not matter to me. The
 - Binary search tree (add edge, rebalance, reverse tree, search ( dfs (inorder) ) [DONE!]
 - Graph (add edge, search ( bfs )) [DONE!]
 - Algorithm: dynamic programming ( memorization )
- - Primes
- - Factorial
- - Longest increasing subsequence
- - Longest common subsequence
- - Shortest common supersequence
- - Edit distance
- - Edit script
- - Dice Throw
+  - Primes
+  - Factorial
+  - Longest increasing subsequence
+  - Longest common subsequence
+  - Shortest common supersequence
+  - Edit distance
+  - Edit script
+  - Dice Throw
 
 ## In Progress
 
 - Algorithm: dynamic programming ( memorization )
- - Box stack
- - Egg drop
- - ... others
+  - Box stack
+  - Egg drop
+  - ... others
 
 
 
