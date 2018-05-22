@@ -26,12 +26,12 @@ Whether or not these are the "right" or "fair" metric does not matter to me. The
   - Edit distance
   - Edit script
   - Dice Throw
+  - Egg drop
 
 ## In Progress
 
 - Algorithm: dynamic programming ( memorization )
   - Box stack
-  - Egg drop
   - ... others
 
 
