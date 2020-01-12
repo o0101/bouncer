@@ -17,7 +17,7 @@ Whether or not these are the "right" or "fair" metric does not matter to me. The
 - Tree (add edge, traverse ( bfs, dfs (preorder, postorder) )) [DONE!]
 - Binary search tree (add edge, rebalance, reverse tree, search ( dfs (inorder) ) [DONE!]
 - Graph (add edge, search ( bfs )) [DONE!]
-- Algorithm: dynamic programming ( memorization )
+- Algorithm: dynamic programming ( memorization ) [DONE!]
   - Primes
   - Factorial
   - Longest increasing subsequence
@@ -28,11 +28,6 @@ Whether or not these are the "right" or "fair" metric does not matter to me. The
   - Dice Throw
   - Egg drop
 
-## In Progress
-
-- Algorithm: dynamic programming ( memorization )
-  - Box stack
-  - ... others
 
 
 
